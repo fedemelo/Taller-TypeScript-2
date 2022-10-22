@@ -6,8 +6,9 @@ function insertSeries(series: Serie[]): void {
     console.log('Desplegando series.');
     series.map(s => {
         let tr: HTMLElement = document.createElement('tr');
-        let html: string = `<td> ${s.id} </td>
-                              <td> <a href=${s.link} target="_blank">${s.name}</a> </td>
+        tr.setAttribute('class', 'fila-serie');
+        let html: string = `<td> <b>${s.id}</b> </td>
+                              <td> <a href=${s.link} target='_blank'>${s.name}</a> </td>
                               <td> ${s.channel} </td>
                               <td> ${s.seasons} </td>`;
         tr.innerHTML = html;
@@ -16,33 +17,51 @@ function insertSeries(series: Serie[]): void {
 }
 
 function insertSeasonsAvrg(series: Serie[]): void {
-    console.log('Calculando promedio.')
+    console.log('Calculando promedio.');
     let sum: number = 0;
     series.map(s => {sum += s.seasons});
     const avrg: number = sum / series.length;
-    console.log('Desplegando promedio.')
+    console.log('Desplegando promedio.');
     const table: HTMLElement = document.getElementById('tabla-series')!;
-    const html: string = '<p>Seasons average: '+avrg+'</p>'
-    table.insertAdjacentHTML('afterend', html)
+    const html: string = '<p>&nbsp; Seasons average: '+avrg+'</p>';
+    table.insertAdjacentHTML('afterend', html);
 }
 
 function showDetail(series: Serie[]): void {
-    const tbody: HTMLElement = document.getElementById('series')!;
-    const trs: HTMLCollection = tbody.getElementsByTagName('tr')!;
-    const col: HTMLElement = document.getElementById('detail')!;
+    const trs: NodeList = document.querySelectorAll('tr.fila-serie');
+    const col: HTMLElement = document.getElementById('detail-col')!;
 
-    for (let i: number = 0; i < trs.length; i++) {
-        let tr: HTMLElement = trs[i];
-        tr.addEventListener('click', function() {
-            console.log('Recibe click')
-            const html: string = `
-            <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src=${series[i].cover} alt="Card image cap">
+    // Detalle por defecto: Breaking Bad
+    const html: string = `
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src=${series[0].cover}>
             <div class="card-body">
-              <h5 class="card-title">${series[i].name}</h5>
-              <p class="card-text">${series[i].description}</p>
+                <h5 class="card-title">${series[0].name}</h5>
+                <p class="card-text">
+                    ${series[0].description}<br><br>
+                    <a href=${series[0].link}>${series[0].link}</a>
+                    <br><br>
+                </p>
             </div>
-          </div>`
+        </div>`
+    col.innerHTML = html;
+
+    // Hacer click en cada fila muestra su detalle
+    for(let i: number = 0; i < trs.length; i++) {
+        trs[i].addEventListener('click', function() {
+            console.log('Fila '+i+' recibe click');
+            const html: string = `
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src=${series[i].cover}>
+                    <div class="card-body">
+                        <h5 class="card-title">${series[i].name}</h5>
+                        <p class="card-text">
+                            ${series[i].description}<br><br>
+                            <a href=${series[i].link}>${series[i].link}</a>
+                            <br><br>
+                        </p>
+                    </div>
+                </div>`
             col.innerHTML = html;
         });
     }
@@ -50,4 +69,5 @@ function showDetail(series: Serie[]): void {
 
 insertSeries(series);
 insertSeasonsAvrg(series);
+showDetail(series);
 
